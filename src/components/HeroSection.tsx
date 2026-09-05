@@ -1,77 +1,322 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Button } from "./ui/button";
+import { HiArrowLongRight } from "react-icons/hi2";
+import { useGSAP } from "@gsap/react";
+import TextPlugin from "gsap/TextPlugin";
 
-import heroVideo from "../assets/videos/hero-scroll.mp4";
+gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
-gsap.registerPlugin(ScrollTrigger);
+const TOTAL_FRAMES = 152;
 
 function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
 
+  // Hero content
+  const heroContentRef = useRef<HTMLDivElement>(null);
+  const writerRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const typeWritterRef = useRef<HTMLSpanElement>(null);
+  const redDotRef = useRef<HTMLSpanElement>(null);
+
+  // Scroll transition
+  const nextButtonRef = useRef<HTMLButtonElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  /*
+   * Scroll-driven image sequence + transition
+   */
   useEffect(() => {
     const section = sectionRef.current;
-    const video = videoRef.current;
+    const image = imageRef.current;
+    const heroContent = heroContentRef.current;
+    const nextButton = nextButtonRef.current;
+    const overlay = overlayRef.current;
 
-    if (!section || !video) return;
+    if (
+      !section ||
+      !image ||
+      !heroContent ||
+      !nextButton ||
+      !overlay
+    ) {
+      return;
+    }
 
-    let scrollTrigger: ScrollTrigger | null = null;
+    const ctx = gsap.context(() => {
+      let currentFrame = -1;
 
-    const setup = () => {
-      if (!video.duration || !Number.isFinite(video.duration)) {
-        return;
-      }
+      const updateFrame = (progress: number) => {
+        const frame = Math.min(
+          TOTAL_FRAMES - 1,
+          Math.floor(progress * TOTAL_FRAMES)
+        );
 
-      video.pause();
-      video.currentTime = 0;
+        // Don't update the image if we're still on the same frame
+        if (frame === currentFrame) return;
 
-      scrollTrigger = ScrollTrigger.create({
+        currentFrame = frame;
+
+        image.src = `/hero/frame-${String(frame + 1).padStart(4, "0")}.webp`;
+      };
+
+      ScrollTrigger.create({
         trigger: section,
         start: "top top",
         end: "+=900vh",
         scrub: true,
         pin: true,
-        anticipatePin: 1,
 
         onUpdate: (self) => {
-          const time = self.progress * video.duration;
+          const progress = self.progress;
 
-          if (Math.abs(video.currentTime - time) > 0.01) {
-            video.currentTime = time;
-          }
+          /*
+           * ------------------------------------------------
+           * 0% → 80%
+           * Image sequence
+           * ------------------------------------------------
+           */
+          const imageProgress = Math.min(progress / 0.8, 1);
+
+          updateFrame(imageProgress);
+
+          /*
+           * ------------------------------------------------
+           * 50% → 60%
+           * Original hero content fades out
+           * ------------------------------------------------
+           */
+          const heroFadeProgress = Math.min(
+            Math.max((progress - 0.3) / 0.1, 0),
+            1
+          );
+
+          gsap.set(heroContent, {
+            y: -30 * heroFadeProgress,
+            opacity: 1 - heroFadeProgress,
+          });
+
+          /*
+           * ------------------------------------------------
+           * 50% → 60%
+           * Black button fades in
+           * ------------------------------------------------
+           */
+          const buttonFadeInProgress = Math.min(
+            Math.max((progress - 0.5) / 0.1, 0),
+            1
+          );
+
+          /*
+           * ------------------------------------------------
+           * 70% → 80%
+           * Black button fades out
+           * ------------------------------------------------
+           */
+          const buttonFadeOutProgress = Math.min(
+            Math.max((progress - 0.7) / 0.1, 0),
+            1
+          );
+
+          const nextButtonOpacity =
+            buttonFadeInProgress * (1 - buttonFadeOutProgress);
+
+          gsap.set(nextButton, {
+            opacity: nextButtonOpacity,
+            y: 30 * (1 - buttonFadeInProgress)
+          });
+
+          /*
+           * ------------------------------------------------
+           * 80% → 100%
+           * White overlay fades in
+           * ------------------------------------------------
+           */
+          const overlayProgress = Math.min(
+            Math.max((progress - 0.8) / 0.2, 0),
+            1
+          );
+
+          gsap.set(overlay, {
+            opacity: overlayProgress,
+          });
         },
       });
-
-      ScrollTrigger.refresh();
-    };
-
-    if (video.readyState >= 1) {
-      setup();
-    } else {
-      video.addEventListener("loadedmetadata", setup);
-    }
+    }, section);
 
     return () => {
-      video.removeEventListener("loadedmetadata", setup);
-      scrollTrigger?.kill();
+      ctx.revert();
     };
   }, []);
+
+  /*
+   * Initial hero content animation
+   */
+  useGSAP(() => {
+    if (
+      !writerRef.current ||
+      !titleRef.current ||
+      !buttonRef.current ||
+      !typeWritterRef.current ||
+      !redDotRef.current
+    ) {
+      return;
+    }
+
+    const dot = writerRef.current.querySelector(".dot");
+
+    if (!dot) return;
+
+    const tl = gsap.timeline({
+      defaults: {
+        duration: 0.3,
+        ease: "sine.out",
+      },
+    });
+
+    tl.set(writerRef.current, {
+      y: 30,
+      opacity: 0,
+    })
+      .set(titleRef.current, {
+        y: 100,
+        opacity: 0,
+      })
+      .set(buttonRef.current, {
+        y: 100,
+        opacity: 0,
+      })
+
+      // Keep dot at its normal visual state
+      .set(redDotRef.current, {
+        scale: 1,
+        opacity: 1,
+        transformOrigin: "center center",
+      })
+
+      .to(writerRef.current, {
+        y: 0,
+        opacity: 1,
+      })
+      .to(
+        titleRef.current,
+        {
+          y: 0,
+          opacity: 1,
+        },
+        "-=0.13"
+      )
+      .to(
+        buttonRef.current,
+        {
+          y: 0,
+          opacity: 1,
+        },
+        "-=0.0001"
+      )
+      .to(typeWritterRef.current, {
+        text: {
+          value: "THE_ORIGIN_DROP // LOADING",
+          delimiter: "",
+        },
+        ease: "none",
+        duration: 2,
+      })
+      .to(dot, {
+        text: {
+          value: "...",
+          delimiter: "",
+        },
+        duration: 1.7,
+        ease: "none",
+        repeat: -1,
+      });
+
+    // Separate pulse animation
+    gsap.to(redDotRef.current, {
+      scale: 1.5,
+      opacity: 0.4,
+      duration: 0.8,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+      transformOrigin: "center center",
+    });
+  });
 
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen overflow-hidden"
+      className="relative h-screen w-full overflow-hidden"
     >
-      <video
-        ref={videoRef}
-        className="block h-full w-full object-cover"
-        muted
-        playsInline
-        preload="auto"
+      {/* Image sequence */}
+      <img
+        ref={imageRef}
+        src="/hero/frame-0001.webp"
+        alt=""
+        className="absolute top-0 left-0 z-1 block h-full w-full object-cover"
+        draggable={false}
+      />
+
+      {/* Final foreground overlay */}
+      <div
+        ref={overlayRef}
+        className="pointer-events-none absolute inset-0 z-5 bg-foreground opacity-0"
+      />
+
+      {/* Original hero content */}
+      <div
+        ref={heroContentRef}
+        className="absolute bottom-8 left-[clamp(1rem,calc(1rem+(100vw-320px)*0.075),4.25rem)] z-10 flex flex-col items-start"
       >
-        <source src={heroVideo} type="video/mp4" />
-      </video>
+        <div
+          ref={writerRef}
+          className="mb-2 flex items-center font-mono text-[0.6rem] font-medium text-destructive"
+        >
+          <span
+            ref={redDotRef}
+            className="mr-2 inline-block h-2 w-2 shrink-0 rounded-full bg-destructive"
+          />
+
+          <span
+            ref={typeWritterRef}
+            className="tracking-[0.14rem]"
+          />
+
+          <span className="dot" />
+        </div>
+
+        <div>
+          <h1
+            ref={titleRef}
+            className="font-sans text-[clamp(3rem,10vw,4rem)] leading-none text-background"
+          >
+            WEAR YOUR
+            <br />
+            STORY
+          </h1>
+
+          <Button
+            ref={buttonRef}
+            className="mt-7 rounded-none bg-destructive px-6 py-6 hover:bg-foreground hover:text-background"
+          >
+            SHOP THE DROP
+            <HiArrowLongRight />
+          </Button>
+        </div>
+      </div>
+
+      {/* Replacement black button */}
+      <Button
+        ref={nextButtonRef}
+        className="absolute bottom-8 left-[clamp(1rem,calc(1rem+(100vw-320px)*0.075),4.25rem)] z-10 rounded-none bg-background px-6 py-6 opacity-0 hover:bg-destructive"
+      >
+        SHOP THE DROP
+        <HiArrowLongRight />
+      </Button>
     </section>
   );
 }
