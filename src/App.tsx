@@ -1,13 +1,13 @@
 import './App.css'
-import SmoothScroll from './components/SmoothScroll'
 import { RouterProvider } from 'react-router'
 import router from './routes/router'
+import { ScrollProvider } from './context/ScrollContext'
 
 function App() {
   return (
-    <SmoothScroll>
+    <ScrollProvider>
       <RouterProvider router={router} />
-    </SmoothScroll>
+    </ScrollProvider>
   )
 }
 

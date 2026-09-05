@@ -59,18 +59,19 @@ function HeroSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative">
-      <div className="h-screen w-full overflow-hidden">
-        <video
-          ref={videoRef}
-          className="block h-full w-full object-cover"
-          muted
-          playsInline
-          preload="auto"
-        >
-          <source src={heroVideo} type="video/mp4" />
-        </video>
-      </div>
+    <section
+      ref={sectionRef}
+      className="relative w-full h-screen overflow-hidden"
+    >
+      <video
+        ref={videoRef}
+        className="block h-full w-full object-cover"
+        muted
+        playsInline
+        preload="auto"
+      >
+        <source src={heroVideo} type="video/mp4" />
+      </video>
     </section>
   );
 }

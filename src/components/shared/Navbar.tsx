@@ -8,6 +8,7 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import { HiOutlineBars3 } from "react-icons/hi2";
 import { RiCloseLargeLine } from "react-icons/ri";
 import { cn } from "@/lib/utils";
+import { useScroll } from "@/context/ScrollContext";
 import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react"
 import gsap from "gsap";
@@ -16,8 +17,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 function Navbar() {
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const mobileMenuRef = useRef<HTMLDivElement>(null)
+  const { scrolled } = useScroll();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
 
   const links: Array<Record<string, string>> = [
     { label: "DROP", link: "/" },
@@ -30,59 +34,60 @@ function Navbar() {
     { label: "ACCOUNT", link: "/" },
   ];
 
+  // Animate background color on scroll when mobile menu is closed
   useGSAP(() => {
-    if (!mobileMenuRef.current) return;
+    if (!navRef.current) return;
+    if (mobileOpen) return;
+
+    gsap.to(navRef.current, {
+      backgroundColor: scrolled ? "rgba(14, 11, 11, 1)" : "transparent",
+      duration: 0.3,
+      ease: "power2.out",
+    });
+  }, [scrolled]);
+
+  // Mobile menu open / close animation
+  useGSAP(() => {
+    if (!mobileMenuRef.current || !navRef.current) return;
+
+    // Prevent closing animation from firing on initial render
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      if (!mobileOpen) return;
+    }
+
+    const tl = gsap.timeline();
+    const linkEls = mobileMenuRef.current.querySelectorAll("a");
 
     if (mobileOpen) {
-      gsap.set(mobileMenuRef.current, {
-        height: 0,
-        pointerEvents: "auto"
-      })
+      tl.set(mobileMenuRef.current, { height: 0, pointerEvents: "auto" })
+        .set(linkEls, { x: -5, y: 5, opacity: 0 });
 
-      gsap.to(mobileMenuRef.current, {
-        height: "auto",
-        duration: 0.3,
-        ease: "power4.inOut"
-      })
-
-      if (mobileMenuRef.current) {
-        const linkEls = mobileMenuRef.current.querySelectorAll("a");
-        gsap.set(linkEls, { x: -5, y: 5, opacity: 0 })
-        gsap.to(linkEls, {
-          x: 0,
-          y: 0,
-          opacity: 100,
-          duration: 0.5,
-          stagger: 0.04,
-          ease: "power2.inOut",
-          delay: 0.1
-        })
-      }
+      tl.to(navRef.current, { backgroundColor: "rgba(14, 11, 11, 1)", duration: 0.3, ease: "power4.inOut" }, 0)
+        .to(mobileMenuRef.current, { height: "auto", duration: 0.3, ease: "power4.inOut" }, "-=0.09")
+        .to(linkEls, { x: 0, y: 0, opacity: 1, duration: 0.5, stagger: 0.04, ease: "power2.inOut" }, "-=0.15");
     } else {
-      gsap.to(mobileMenuRef.current, {
-        height: 0,
-        duration: 0.3,
-        ease: "power4.inOut",
-        delay: 0.1,
-      })
+      const reversedLinks = Array.from(linkEls).toReversed();
 
-      if (mobileMenuRef.current) {
-        const linkEls = Array.from(mobileMenuRef.current.querySelectorAll("a")).toReversed()
-        gsap.to(linkEls, {
-          x: -5,
-          y: 5,
-          opacity: 0,
-          duration: 0.5,
-          stagger: 0.04,
-          ease: "power4.inOut",
-        })
+      tl.to(reversedLinks, { x: -5, y: 5, opacity: 0, duration: 0.5, stagger: 0.04, ease: "power4.inOut" }, 0)
+        .to(mobileMenuRef.current, { height: 0, duration: 0.3, ease: "power4.inOut", pointerEvents: "none" }, "-=0.25");
+
+      // Only transition back to transparent if the user is not currently scrolled
+      if (!scrolled) {
+        tl.to(navRef.current, { backgroundColor: "transparent", duration: 0.3, ease: "power4.inOut" }, "-=0.25");
       }
     }
-  }, [mobileOpen])
+  }, [mobileOpen]);
 
   return (
-    <nav className={cn("w-full max-w-360 mx-auto top-0 left-0 right-0 z-50 transition-colors duration-300")}>
-      <div className="flex justify-between items-center px-4 md:px-10 py-3.5">
+    <nav
+      className={cn(
+        "w-full max-w-360 mx-auto fixed left-0 right-0 z-50 transition-all duration-300",
+        scrolled ? "top-0 shadow-md" : "top-7"
+      )}
+      ref={navRef}
+    >
+      <div className="flex justify-between items-center px-4 md:px-10 py-3.5 bg-transparent">
         <div className="text-[1.7rem]">ZENJI</div>
         <div className="font-mono text-[0.6rem] font-semibold">
           {
@@ -128,7 +133,7 @@ function Navbar() {
         </div>
       </div>
 
-      <div className="flex flex-col bg-background overflow-hidden px-4 md:px-10 h-0 font-mono pt-2.5 text-[0.8rem] font-bold" ref={mobileMenuRef}>
+      <div className={cn("flex flex-col md:hidden bg-background overflow-hidden px-4 md:px-10 h-0 font-mono text-[0.8rem] font-bold")} ref={mobileMenuRef}>
         {
           links.map(link => <Link key={link.label} to={link.link} className="py-2.5 border-t border-foreground/10">{link.label}</Link>)
         }
