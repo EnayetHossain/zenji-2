@@ -5,11 +5,11 @@ import { Outlet } from "react-router";
 function MainLayout() {
   return (
     <div>
+      <MarqueeComponent />
       <Navbar />
       <main>
         <Outlet />
       </main>
-      <MarqueeComponent />
       <footer>footer</footer>
     </div>
   )
