@@ -14,7 +14,6 @@ function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
-  // Hero content
   const heroContentRef = useRef<HTMLDivElement>(null);
   const writerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -22,13 +21,9 @@ function HeroSection() {
   const typeWritterRef = useRef<HTMLSpanElement>(null);
   const redDotRef = useRef<HTMLSpanElement>(null);
 
-  // Scroll transition
   const nextButtonRef = useRef<HTMLButtonElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  /*
-   * Scroll-driven image sequence + transition
-   */
   useEffect(() => {
     const section = sectionRef.current;
     const image = imageRef.current;
@@ -55,7 +50,6 @@ function HeroSection() {
           Math.floor(progress * TOTAL_FRAMES)
         );
 
-        // Don't update the image if we're still on the same frame
         if (frame === currentFrame) return;
 
         currentFrame = frame;
@@ -73,24 +67,18 @@ function HeroSection() {
         onUpdate: (self) => {
           const progress = self.progress;
 
-          /*
-           * ------------------------------------------------
-           * 0% → 80%
-           * Image sequence
-           * ------------------------------------------------
-           */
+          // -------------------------
+          // Image sequence: 0 → 80%
+          // -------------------------
           const imageProgress = Math.min(progress / 0.8, 1);
 
           updateFrame(imageProgress);
 
-          /*
-           * ------------------------------------------------
-           * 50% → 60%
-           * Original hero content fades out
-           * ------------------------------------------------
-           */
+          // -------------------------
+          // Original hero content: 0 → 50%
+          // -------------------------
           const heroFadeProgress = Math.min(
-            Math.max((progress - 0.3) / 0.1, 0),
+            Math.max(progress / 0.2, 0),
             1
           );
 
@@ -99,42 +87,22 @@ function HeroSection() {
             opacity: 1 - heroFadeProgress,
           });
 
-          /*
-           * ------------------------------------------------
-           * 50% → 60%
-           * Black button fades in
-           * ------------------------------------------------
-           */
-          const buttonFadeInProgress = Math.min(
-            Math.max((progress - 0.5) / 0.1, 0),
+          // -------------------------
+          // New button: 70 → 80%
+          // -------------------------
+          const buttonProgress = Math.min(
+            Math.max((progress - 0.4) / 0.1, 0),
             1
           );
-
-          /*
-           * ------------------------------------------------
-           * 70% → 80%
-           * Black button fades out
-           * ------------------------------------------------
-           */
-          const buttonFadeOutProgress = Math.min(
-            Math.max((progress - 0.7) / 0.1, 0),
-            1
-          );
-
-          const nextButtonOpacity =
-            buttonFadeInProgress * (1 - buttonFadeOutProgress);
 
           gsap.set(nextButton, {
-            opacity: nextButtonOpacity,
-            y: 30 * (1 - buttonFadeInProgress)
+            opacity: buttonProgress,
+            y: 30 * (1 - buttonProgress),
           });
 
-          /*
-           * ------------------------------------------------
-           * 80% → 100%
-           * White overlay fades in
-           * ------------------------------------------------
-           */
+          // -------------------------
+          // Overlay: 80 → 100%
+          // -------------------------
           const overlayProgress = Math.min(
             Math.max((progress - 0.8) / 0.2, 0),
             1
@@ -152,9 +120,6 @@ function HeroSection() {
     };
   }, []);
 
-  /*
-   * Initial hero content animation
-   */
   useGSAP(() => {
     if (
       !writerRef.current ||
@@ -190,7 +155,6 @@ function HeroSection() {
         opacity: 0,
       })
 
-      // Keep dot at its normal visual state
       .set(redDotRef.current, {
         scale: 1,
         opacity: 1,
@@ -235,7 +199,6 @@ function HeroSection() {
         repeat: -1,
       });
 
-    // Separate pulse animation
     gsap.to(redDotRef.current, {
       scale: 1.5,
       opacity: 0.4,
@@ -252,7 +215,6 @@ function HeroSection() {
       ref={sectionRef}
       className="relative h-screen w-full overflow-hidden"
     >
-      {/* Image sequence */}
       <img
         ref={imageRef}
         src="/hero/frame-0001.webp"
@@ -261,13 +223,11 @@ function HeroSection() {
         draggable={false}
       />
 
-      {/* Final foreground overlay */}
       <div
         ref={overlayRef}
-        className="pointer-events-none absolute inset-0 z-5 bg-foreground opacity-0"
+        className="pointer-events-none absolute inset-0 z-10 bg-foreground opacity-0"
       />
 
-      {/* Original hero content */}
       <div
         ref={heroContentRef}
         className="absolute bottom-8 left-[clamp(1rem,calc(1rem+(100vw-320px)*0.075),4.25rem)] z-10 flex flex-col items-start"
@@ -309,10 +269,9 @@ function HeroSection() {
         </div>
       </div>
 
-      {/* Replacement black button */}
       <Button
         ref={nextButtonRef}
-        className="absolute bottom-8 left-[clamp(1rem,calc(1rem+(100vw-320px)*0.075),4.25rem)] z-10 rounded-none bg-background px-6 py-6 opacity-0 hover:bg-destructive"
+        className="absolute bottom-8 left-[clamp(1rem,calc(1rem+(100vw-320px)*0.075),4.25rem)] z-5 rounded-none bg-background px-6 py-6 opacity-0 hover:bg-destructive"
       >
         SHOP THE DROP
         <HiArrowLongRight />
