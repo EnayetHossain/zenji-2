@@ -83,7 +83,7 @@ function HeroSection() {
           );
 
           gsap.set(heroContent, {
-            y: -30 * heroFadeProgress,
+            y: -60 * heroFadeProgress,
             opacity: 1 - heroFadeProgress,
           });
 
