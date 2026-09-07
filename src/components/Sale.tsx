@@ -28,9 +28,6 @@ function Sale() {
     const N = cardEls.length;
 
     const ctx = gsap.context(() => {
-      // -------------------------
-      // Tunable values
-      // -------------------------
       const GAP = 30;          // px: how much of each earlier card peeks above the next
       const SHRINK_STEP = 0.06; // how much smaller each "buried" layer gets
 

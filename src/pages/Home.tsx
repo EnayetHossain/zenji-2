@@ -1,5 +1,6 @@
 import HeroSection from "@/components/HeroSection";
 import Origin from "@/components/Origin";
+import Products from "@/components/Products";
 import Sale from "@/components/Sale";
 
 function Home() {
@@ -8,6 +9,7 @@ function Home() {
       <HeroSection />
       <Origin />
       <Sale />
+      <Products />
     </div>
   )
 }
