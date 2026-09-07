@@ -31,18 +31,21 @@ function HeroSection() {
     const nextButton = nextButtonRef.current;
     const overlay = overlayRef.current;
 
-    // If refs aren't available yet, retry after a short delay (common in production/hydration)
     if (!section || !image || !heroContent || !nextButton || !overlay) {
-      const retryTimer = setTimeout(() => {
-        // Re-read refs at retry time
-        if (sectionRef.current && imageRef.current && heroContentRef.current && nextButtonRef.current && overlayRef.current) {
-          ScrollTrigger.refresh();
-        }
-      }, 200);
-      return () => clearTimeout(retryTimer);
+      return;
     }
 
     const ctx = gsap.context(() => {
+      const frames: HTMLImageElement[] = [];
+
+      for (let i = 0; i < TOTAL_FRAMES; i++) {
+        const frame = new Image();
+
+        frame.src = `/hero/frame-${String(i + 1).padStart(4, "0")}.webp`;
+
+        frames.push(frame);
+      }
+
       let currentFrame = -1;
 
       const updateFrame = (progress: number) => {
@@ -55,10 +58,12 @@ function HeroSection() {
 
         currentFrame = frame;
 
-        image.src = `/hero/frame-${String(frame + 1).padStart(4, "0")}.webp`;
+        if (frames[frame].complete) {
+          image.src = frames[frame].src;
+        }
       };
 
-      ScrollTrigger.create({
+      const trigger = ScrollTrigger.create({
         trigger: section,
         start: "top top",
         end: "+=900vh",
@@ -71,21 +76,17 @@ function HeroSection() {
 
           console.log(
             "progress:",
-            self.progress,
+            progress,
             "frame:",
-            Math.floor(self.progress * TOTAL_FRAMES)
+            Math.floor(progress * TOTAL_FRAMES)
           );
 
-          // -------------------------
-          // Image sequence: 0 → 80%
-          // -------------------------
+          // Image
           const imageProgress = Math.min(progress / 0.8, 1);
 
           updateFrame(imageProgress);
 
-          // -------------------------
-          // Original hero content: 0 → 50%
-          // -------------------------
+          // Hero content
           const heroFadeProgress = Math.min(
             Math.max(progress / 0.2, 0),
             1
@@ -96,9 +97,7 @@ function HeroSection() {
             opacity: 1 - heroFadeProgress,
           });
 
-          // -------------------------
-          // New button: 70 → 80%
-          // -------------------------
+          // Button
           const buttonProgress = Math.min(
             Math.max((progress - 0.4) / 0.1, 0),
             1
@@ -109,9 +108,7 @@ function HeroSection() {
             y: 30 * (1 - buttonProgress),
           });
 
-          // -------------------------
-          // Overlay: 80 → 100%
-          // -------------------------
+          // Overlay
           const overlayProgress = Math.min(
             Math.max((progress - 0.8) / 0.2, 0),
             1
@@ -122,10 +119,13 @@ function HeroSection() {
           });
         },
       });
-    }, section);
 
-    // Refresh ScrollTrigger after creation so calculations are accurate in production builds
-    setTimeout(() => ScrollTrigger.refresh(), 50);
+      ScrollTrigger.refresh();
+
+      return () => {
+        trigger.kill();
+      };
+    }, section);
 
     return () => {
       ctx.revert();
