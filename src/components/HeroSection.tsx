@@ -69,6 +69,13 @@ function HeroSection() {
         onUpdate: (self) => {
           const progress = self.progress;
 
+          console.log(
+            "progress:",
+            self.progress,
+            "frame:",
+            Math.floor(self.progress * TOTAL_FRAMES)
+          );
+
           // -------------------------
           // Image sequence: 0 → 80%
           // -------------------------
