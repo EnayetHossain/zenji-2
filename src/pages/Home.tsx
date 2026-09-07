@@ -1,3 +1,4 @@
+import About from "@/components/About";
 import HeroSection from "@/components/HeroSection";
 import Origin from "@/components/Origin";
 import Products from "@/components/Products";
@@ -10,6 +11,7 @@ function Home() {
       <Origin />
       <Sale />
       <Products />
+      <About />
     </div>
   )
 }

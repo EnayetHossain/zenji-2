@@ -28,13 +28,12 @@ function Sale() {
     const N = cardEls.length;
 
     const ctx = gsap.context(() => {
-      const GAP = 30;          // px: how much of each earlier card peeks above the next
-      const SHRINK_STEP = 0.06; // how much smaller each "buried" layer gets
+      const GAP = 30;
+      const SHRINK_STEP = 0.06;
 
-      // Initial state: card 0 in place, all others waiting below the viewport.
       cardEls.forEach((card, i) => {
         gsap.set(card, {
-          xPercent: -50,             // horizontal centering paired with CSS `left: 50%`
+          xPercent: -50,
           top: i * GAP,
           y: i === 0 ? 0 : "100vh",
           scale: 1,
@@ -42,7 +41,7 @@ function Sale() {
         });
       });
 
-      const totalSteps = N - 1; // number of "new card arrives" transitions
+      const totalSteps = N - 1;
 
       ScrollTrigger.create({
         trigger: section,
@@ -55,7 +54,6 @@ function Sale() {
           const progress = self.progress;
           const segment = 1 / totalSteps;
 
-          // How "arrived" each incoming card (index 1..N-1) is, 0 → 1
           const arrival: number[] = new Array(N).fill(0);
 
           for (let i = 1; i < N; i++) {
@@ -66,7 +64,6 @@ function Sale() {
             gsap.set(cardEls[i], { y: `${100 * (1 - a)}vh` });
           }
 
-          // Each card's scale shrinks once for every later card that has arrived.
           for (let k = 0; k < N; k++) {
             let shrinkCount = 0;
             for (let i = k + 1; i < N; i++) shrinkCount += arrival[i];
