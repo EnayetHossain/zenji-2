@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollSmoother } from "gsap/ScrollSmoother";
@@ -12,6 +12,7 @@ gsap.registerPlugin(ScrollTrigger, ScrollSmoother)
 function SmoothScroll({ children }: SmoothScrollProps) {
   const smoothWrapper = useRef<HTMLDivElement>(null)
   const smoothContent = useRef<HTMLDivElement>(null)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
     if (!smoothWrapper.current || !smoothContent.current) return;
@@ -23,13 +24,18 @@ function SmoothScroll({ children }: SmoothScrollProps) {
       effects: true
     })
 
-    return () => smoother.kill()
+    setReady(true)
+
+    return () => {
+      smoother.kill()
+      setReady(false)
+    }
   }, [])
 
   return (
     <div ref={smoothWrapper} id="smooth-wrapper" className="overflow-hidden w-full">
       <div ref={smoothContent} id="smooth-content" className="w-full">
-        {children}
+        {ready ? children : null}
       </div>
     </div>
   )
