@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "title": "BLUE FLAME TEE",
+    "sale": true,
+    "saleParcentage": "15%",
+    "discountPrice": "33.99",
+    "price": "39.99",
+    "url": "/src/assets/images/Blue-flame-1.avif",
+    "url2": "/src/assets/images/Blue-flame-2.avif"
+  },
+  {
+    "id": 2,
+    "title": "BUSHIDO TEE",
+    "sale": false,
+    "price": "39.99",
+    "url": "/src/assets/images/Bushido-1.avif",
+    "url2": "/src/assets/images/Bushido-2.avif"
+  },
+  {
+    "id": 3,
+    "title": "DEMON BLOOD TEE",
+    "sale": true,
+    "saleParcentage": "15%",
+    "discountPrice": "33.99",
+    "price": "39.99",
+    "url": "/src/assets/images/Demon-blood-1.avif",
+    "url2": "/src/assets/images/Demon-blood-2.avif"
+  },
+  {
+    "id": 4,
+    "title": "DOMAIN EXPANSION TEE",
+    "sale": false,
+    "price": "39.99",
+    "url": "/src/assets/images/Domain-expansion-1.avif",
+    "url2": "/src/assets/images/Domain-expansion-2.avif"
+  },
+  {
+    "id": 5,
+    "title": "FREE SOUL TEE",
+    "sale": false,
+    "price": "39.99",
+    "url": "/src/assets/images/Free-soul-1.avif",
+    "url2": "/src/assets/images/Free-soul-2.avif"
+  },
+  {
+    "id": 6,
+    "title": "LIMITLESS TEE",
+    "sale": false,
+    "price": "39.99",
+    "url": "/src/assets/images/Limitless-1.avif",
+    "url2": "/src/assets/images/Limitless-2.avif"
+  },
+  {
+    "id": 7,
+    "title": "PARADISE SPIRIT TEE",
+    "sale": false,
+    "price": "39.99",
+    "url": "/src/assets/images/Paradise-spirit-1.avif",
+    "url2": "/src/assets/images/Paradise-spirit-2.avif"
+  },
+  {
+    "id": 8,
+    "title": "WARRIOR SPIRIT TEE",
+    "sale": true,
+    "saleParcentage": "15%",
+    "discountPrice": "33.99",
+    "price": "39.99",
+    "url": "/src/assets/images/Warrior-spirit-1.avif",
+    "url2": "/src/assets/images/Warrior-spirit-2.avif"
+  },
+  {
+    "id": 9,
+    "title": "WATER BREATHING TEE",
+    "sale": false,
+    "price": "39.99",
+    "url": "/src/assets/images/Water-breathing-1.avif",
+    "url2": "/src/assets/images/Water-breathing-2.avif"
+  },
+  {
+    "id": 10,
+    "title": "WILL OF THE SUN TEE",
+    "sale": true,
+    "saleParcentage": "15%",
+    "discountPrice": "33.99",
+    "price": "39.99",
+    "url": "/src/assets/images/Will-of-the-sun-1.avif",
+    "url2": "/src/assets/images/Will-of-the-sun-2.avif"
+  }
+]

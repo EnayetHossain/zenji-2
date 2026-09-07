@@ -3,15 +3,18 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { HiArrowLongRight } from "react-icons/hi2";
 import { Button } from "./ui/button";
-import sale from "@/assets/images/sale.jpg";
+import slide1 from "@/assets/images/slide-1.avif";
+import slide2 from "@/assets/images/slide-2.avif";
+import slide3 from "@/assets/images/slide-3.avif";
+import slide4 from "@/assets/images/slide-4.avif";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const CARDS = [
-  { id: 1, title: "WARRIOR SPIRIT TEE" },
-  { id: 2, title: "BLUE FLAME TEE" },
-  { id: 3, title: "DEMON BLOOD TEE" },
-  { id: 4, title: "WILL OF THE SUN TEE" },
+  { id: 1, title: "WARRIOR SPIRIT TEE", url: slide1 },
+  { id: 2, title: "BLUE FLAME TEE", url: slide2 },
+  { id: 3, title: "DEMON BLOOD TEE", url: slide3 },
+  { id: 4, title: "WILL OF THE SUN TEE", url: slide4 },
 ];
 
 function Sale() {
@@ -106,16 +109,24 @@ function Sale() {
             style={{ zIndex: 10 * (i + 1) }}
           >
             <img
-              src={sale}
+              src={card.url}
               alt={card.title}
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-cover object-[center_18%]"
             />
 
+            {/* Bottom gradient overlay */}
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-background/90 via-background/50 to-transparent pointer-events-none" />
+
+            {/* Text */}
             <div className="absolute bottom-5 left-5 text-foreground">
               <div className="font-mono text-[0.6rem] tracking-widest">
                 <span className="text-destructive">COLLECTION</span> // THE_ORIGIN_DROP
               </div>
-              <div className="text-3xl hover:text-destructive py-2">{card.title}</div>
+
+              <div className="text-3xl hover:text-destructive py-2">
+                {card.title}
+              </div>
+
               <Button className="rounded-none bg-transparent border-b border-b-foreground px-0 font-mono text-[0.6rem] h-5 hover:bg-transparent hover:text-destructive hover:border-b-destructive">
                 SHOP {card.title}
                 <HiArrowLongRight />
