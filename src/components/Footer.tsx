@@ -51,7 +51,7 @@ function Footer() {
 
       ScrollTrigger.create({
         trigger: footerRef.current,
-        start: "top 10%",
+        start: "top 40%",
         toggleActions: "play none none none",
         onEnter: () => {
           gsap.to(dropLinks, {
