@@ -31,14 +31,15 @@ function HeroSection() {
     const nextButton = nextButtonRef.current;
     const overlay = overlayRef.current;
 
-    if (
-      !section ||
-      !image ||
-      !heroContent ||
-      !nextButton ||
-      !overlay
-    ) {
-      return;
+    // If refs aren't available yet, retry after a short delay (common in production/hydration)
+    if (!section || !image || !heroContent || !nextButton || !overlay) {
+      const retryTimer = setTimeout(() => {
+        // Re-read refs at retry time
+        if (sectionRef.current && imageRef.current && heroContentRef.current && nextButtonRef.current && overlayRef.current) {
+          ScrollTrigger.refresh();
+        }
+      }, 200);
+      return () => clearTimeout(retryTimer);
     }
 
     const ctx = gsap.context(() => {
@@ -63,6 +64,7 @@ function HeroSection() {
         end: "+=900vh",
         scrub: true,
         pin: true,
+        refreshPriority: 1,
 
         onUpdate: (self) => {
           const progress = self.progress;
@@ -114,6 +116,9 @@ function HeroSection() {
         },
       });
     }, section);
+
+    // Refresh ScrollTrigger after creation so calculations are accurate in production builds
+    setTimeout(() => ScrollTrigger.refresh(), 50);
 
     return () => {
       ctx.revert();
