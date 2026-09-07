@@ -8,7 +8,7 @@ import TextPlugin from "gsap/TextPlugin";
 
 gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
-const TOTAL_FRAMES = 76;
+const TOTAL_FRAMES = 38;
 
 function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
